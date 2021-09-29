@@ -1,5 +1,5 @@
-[![](https://img.shields.io/npm/v/locomotive-scroll)](https://www.npmjs.com/package/locomotive-scroll)
-[![](https://img.shields.io/npm/dm/locomotive-scroll)](https://www.npmjs.com/package/locomotive-scroll)
+[![](https://img.shields.io/npm/v/@studio-freight/locomotive-scroll)](https://www.npmjs.com/package/@studio-freight/locomotive-scroll)
+[![](https://img.shields.io/npm/dm/@studio-freight/locomotive-scroll)](https://www.npmjs.com/package/@studio-freight/locomotive-scroll)
 
 <p align="center">
     <a href="https://github.com/locomotivemtl/locomotive-scroll">
@@ -9,12 +9,21 @@
 <h1 align="center">Locomotive Scroll</h1>
 <p align="center">Detection of elements in viewport & smooth scrolling with parallax effects.</p>
 
+## Why
+[Locomotive Scroll](https://github.com/locomotivemtl/locomotive-scroll) seems to be not maintained anymore.
+<p>This package includes:
+<ul>
+    <li>custom raf option</li>
+    <li>parallax on mobile</li>
+</ul>
+</p>
+
 ## Installation
 
 > ⚠️ Scroll-hijacking is a controversial practice that can cause usability, accessibility, and performance issues. Please use responsibly.
 
 ```sh
-npm install locomotive-scroll
+npm install @studio-freight/locomotive-scroll
 ```
 
 ## Usage
@@ -31,7 +40,7 @@ With simple detection.
 #### CSS
 Add the base styles to your CSS file.
 
-[`locomotive-scroll.css`](https://github.com/locomotivemtl/locomotive-scroll/blob/master/dist/locomotive-scroll.css)
+[`locomotive-scroll.css`](https://github.com/@studio-freight/locomotive-scroll/blob/master/dist/locomotive-scroll.css)
 
 #### JS
 
@@ -151,6 +160,7 @@ scroll.on('call', func => {
 | `tablet` & `smartphone` | `object`  |                        | Object allowing to override some options for a particular context. You can specify: <ul><li>`smooth`</li><li>`direction`</li><li>`horizontalGesture`</li></ul>For `tablet` context you can also define `breakpoint` (_integer_, defaults to 1024) to set the max-width breakpoint for tablets.     |
 | `reloadOnContextChange` | `boolean` | `false`                | Allows to reload the page when switching between `desktop`, `tablet` and `smartphone` contexts. It can be useful if your page changes a lot between contexts and you want to reset everything.                                                                                                     |
 | `resetNativeScroll` | `boolean` | `true`                | Sets `history.scrollRestoration = 'manual'` and calls `window.scrollTo(0, 0)` on locomotive-scroll init in Native Class. Useful if you use transitions with native scrolling, otherwise we advise to set it to `false` if you don't want to break History API's scroll restoration feature. |
+| `autoRaf` | `boolean` | `true`                | Defines if locomotive-scroll should use its own raf or a custom one. If `true` you have to trigger `.raf()` manually. |
 
 ## Element attributes
 
