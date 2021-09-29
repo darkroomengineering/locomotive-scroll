@@ -107,12 +107,12 @@ export default class extends Core {
         this.startScrollTs = Date.now(); // Record timestamp
 
         this.isScrolling = true;
-        this.checkScroll();
+        // this.checkScroll();
         this.html.classList.add(this.scrollingClass);
     }
 
     stopScrolling() {
-        cancelAnimationFrame(this.checkScrollRaf); // Prevent checkScroll to continue looping
+        // cancelAnimationFrame(this.checkScrollRaf); // Prevent checkScroll to continue looping
 
         if (this.scrollToRaf) {
             cancelAnimationFrame(this.scrollToRaf);
@@ -196,16 +196,20 @@ export default class extends Core {
 
         this.stopScrolling(); // Stop any movement, allows to kill any other `scrollTo` still happening
         this.isScrolling = true;
-        this.checkScroll();
+        // this.checkScroll();
         this.html.classList.add(this.scrollingClass);
+    }
+
+    raf() {
+        this.checkScroll();
     }
 
     checkScroll(forced = false) {
         if (forced || this.isScrolling || this.isDraggingScrollbar) {
-            if (!this.hasScrollTicking) {
-                this.checkScrollRaf = requestAnimationFrame(() => this.checkScroll());
-                this.hasScrollTicking = true;
-            }
+            // if (!this.hasScrollTicking) {
+            // this.checkScrollRaf = requestAnimationFrame(() => this.checkScroll());
+            //     this.hasScrollTicking = true;
+            // }
 
             this.updateScroll();
 
@@ -280,7 +284,7 @@ export default class extends Core {
 
             super.checkScroll();
 
-            this.hasScrollTicking = false;
+            // this.hasScrollTicking = false;
         }
     }
 
@@ -484,7 +488,7 @@ export default class extends Core {
 
     getScrollBar(e) {
         this.isDraggingScrollbar = true;
-        this.checkScroll();
+        // this.checkScroll();
         this.html.classList.remove(this.scrollingClass);
         this.html.classList.add(this.draggingClass);
     }

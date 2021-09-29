@@ -1,4 +1,4 @@
-/* locomotive-scroll v4.1.1 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* locomotive-scroll v4.1.2 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -279,6 +279,7 @@ var defaults = {
   firefoxMultiplier: 50,
   touchMultiplier: 2,
   resetNativeScroll: true,
+  autoRaf: true,
   tablet: {
     smooth: false,
     direction: 'vertical',
@@ -1067,6 +1068,46 @@ var smoothscroll = createCommonjsModule(function (module, exports) {
 });
 var smoothscroll_1 = smoothscroll.polyfill;
 
+/**
+ * Returns an array containing all the parent nodes of the given node
+ * @param  {object} node
+ * @return {array} parent nodes
+ */
+function getParents(elem) {
+  // Set up a parent array
+  var parents = []; // Push each parent element to the array
+
+  for (; elem && elem !== document; elem = elem.parentNode) {
+    parents.push(elem);
+  } // Return our parent array
+
+
+  return parents;
+} // https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
+
+function getTranslate(el) {
+  var translate = {};
+  if (!window.getComputedStyle) return;
+  var style = getComputedStyle(el);
+  var transform = style.transform || style.webkitTransform || style.mozTransform;
+  var mat = transform.match(/^matrix3d\((.+)\)$/);
+
+  if (mat) {
+    translate.x = mat ? parseFloat(mat[1].split(', ')[12]) : 0;
+    translate.y = mat ? parseFloat(mat[1].split(', ')[13]) : 0;
+  } else {
+    mat = transform.match(/^matrix\((.+)\)$/);
+    translate.x = mat ? parseFloat(mat[1].split(', ')[4]) : 0;
+    translate.y = mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+  }
+
+  return translate;
+}
+
+function lerp(start, end, amt) {
+  return (1 - amt) * start + amt * end;
+}
+
 var _default$1 = /*#__PURE__*/function (_Core) {
   _inherits(_default, _Core);
 
@@ -1103,6 +1144,9 @@ var _default$1 = /*#__PURE__*/function (_Core) {
     key: "init",
     value: function init() {
       this.instance.scroll.y = window.pageYOffset;
+      this.parallaxElements = {};
+      this.sections = {};
+      this.addSections();
       this.addElements();
       this.detectElements();
 
@@ -1130,11 +1174,16 @@ var _default$1 = /*#__PURE__*/function (_Core) {
         if (!this.hasScrollTicking) {
           requestAnimationFrame(function () {
             _this2.detectElements();
+
+            _this2.transformElements();
           });
           this.hasScrollTicking = true;
         }
       }
     }
+  }, {
+    key: "raf",
+    value: function raf() {}
   }, {
     key: "addDirection",
     value: function addDirection() {
@@ -1166,22 +1215,75 @@ var _default$1 = /*#__PURE__*/function (_Core) {
       }
     }
   }, {
-    key: "addElements",
-    value: function addElements() {
+    key: "addSections",
+    value: function addSections() {
       var _this3 = this;
 
+      this.sections = {};
+      var sections = this.el.querySelectorAll("[data-".concat(this.name, "-section]"));
+
+      if (sections.length === 0) {
+        sections = [this.el];
+      }
+
+      sections.forEach(function (section, index) {
+        var id = typeof section.dataset[_this3.name + 'Id'] === 'string' ? section.dataset[_this3.name + 'Id'] : 'section' + index;
+        var sectionBCR = section.getBoundingClientRect();
+        var offset = {
+          x: sectionBCR.left - window.innerWidth * 1.5 - getTranslate(section).x,
+          y: sectionBCR.top - window.innerHeight * 1.5 - getTranslate(section).y
+        };
+        var limit = {
+          x: offset.x + sectionBCR.width + window.innerWidth * 2,
+          y: offset.y + sectionBCR.height + window.innerHeight * 2
+        };
+        var persistent = typeof section.dataset[_this3.name + 'Persistent'] === 'string';
+        section.setAttribute('data-scroll-section-id', id);
+        var mappedSection = {
+          el: section,
+          offset: offset,
+          limit: limit,
+          inView: false,
+          persistent: persistent,
+          id: id
+        };
+        _this3.sections[id] = mappedSection;
+      });
+    }
+  }, {
+    key: "addElements",
+    value: function addElements() {
+      var _this4 = this;
+
       this.els = {};
-      var els = this.el.querySelectorAll('[data-' + this.name + ']');
+      this.parallaxElements = {}; // this.sections.forEach((section, y) => {
+
+      var els = this.el.querySelectorAll("[data-".concat(this.name, "]"));
       els.forEach(function (el, index) {
-        var BCR = el.getBoundingClientRect();
-        var cl = el.dataset[_this3.name + 'Class'] || _this3["class"];
-        var id = typeof el.dataset[_this3.name + 'Id'] === 'string' ? el.dataset[_this3.name + 'Id'] : index;
+        // Try and find the target's parent section
+        var targetParents = getParents(el);
+        var section = Object.entries(_this4.sections).map(function (_ref) {
+          var _ref2 = _slicedToArray(_ref, 2),
+              key = _ref2[0],
+              section = _ref2[1];
+
+          return section;
+        }).find(function (section) {
+          return targetParents.includes(section.el);
+        });
+        var cl = el.dataset[_this4.name + 'Class'] || _this4["class"];
+        var id = typeof el.dataset[_this4.name + 'Id'] === 'string' ? el.dataset[_this4.name + 'Id'] : 'el' + index;
         var top;
         var left;
-        var offset = typeof el.dataset[_this3.name + 'Offset'] === 'string' ? el.dataset[_this3.name + 'Offset'].split(',') : _this3.offset;
-        var repeat = el.dataset[_this3.name + 'Repeat'];
-        var call = el.dataset[_this3.name + 'Call'];
-        var target = el.dataset[_this3.name + 'Target'];
+        var repeat = el.dataset[_this4.name + 'Repeat'];
+        var call = el.dataset[_this4.name + 'Call'];
+        var position = el.dataset[_this4.name + 'Position'];
+        var delay = el.dataset[_this4.name + 'Delay'];
+        var direction = el.dataset[_this4.name + 'Direction'];
+        var sticky = typeof el.dataset[_this4.name + 'Sticky'] === 'string';
+        var speed = el.dataset[_this4.name + 'Speed'] ? parseFloat(el.dataset[_this4.name + 'Speed']) / 10 : false;
+        var offset = typeof el.dataset[_this4.name + 'Offset'] === 'string' ? el.dataset[_this4.name + 'Offset'].split(',') : _this4.offset;
+        var target = el.dataset[_this4.name + 'Target'];
         var targetEl;
 
         if (target !== undefined) {
@@ -1191,29 +1293,96 @@ var _default$1 = /*#__PURE__*/function (_Core) {
         }
 
         var targetElBCR = targetEl.getBoundingClientRect();
-        top = targetElBCR.top + _this3.instance.scroll.y;
-        left = targetElBCR.left + _this3.instance.scroll.x;
+
+        if (section === null) {
+          top = targetElBCR.top + _this4.instance.scroll.y - getTranslate(targetEl).y;
+          left = targetElBCR.left + _this4.instance.scroll.x - getTranslate(targetEl).x;
+        } else {
+          if (!section.inView) {
+            top = targetElBCR.top - getTranslate(section.el).y - getTranslate(targetEl).y;
+            left = targetElBCR.left - getTranslate(section.el).x - getTranslate(targetEl).x;
+          } else {
+            top = targetElBCR.top + _this4.instance.scroll.y - getTranslate(targetEl).y;
+            left = targetElBCR.left + _this4.instance.scroll.x - getTranslate(targetEl).x;
+          }
+        }
+
         var bottom = top + targetEl.offsetHeight;
         var right = left + targetEl.offsetWidth;
+        var middle = {
+          x: (right - left) / 2 + left,
+          y: (bottom - top) / 2 + top
+        };
+
+        if (sticky) {
+          var elBCR = el.getBoundingClientRect();
+          var elTop = elBCR.top;
+          var elLeft = elBCR.left;
+          var elDistance = {
+            x: elLeft - left,
+            y: elTop - top
+          };
+          top += window.innerHeight;
+          left += window.innerWidth;
+          bottom = elTop + targetEl.offsetHeight - el.offsetHeight - elDistance[_this4.directionAxis];
+          right = elLeft + targetEl.offsetWidth - el.offsetWidth - elDistance[_this4.directionAxis];
+          middle = {
+            x: (right - left) / 2 + left,
+            y: (bottom - top) / 2 + top
+          };
+        }
 
         if (repeat == 'false') {
           repeat = false;
         } else if (repeat != undefined) {
           repeat = true;
         } else {
-          repeat = _this3.repeat;
+          repeat = _this4.repeat;
         }
 
-        var relativeOffset = _this3.getRelativeOffset(offset);
+        var relativeOffset = [0, 0];
 
-        top = top + relativeOffset[0];
-        bottom = bottom - relativeOffset[1];
+        if (offset) {
+          if (_this4.direction === 'horizontal') {
+            for (var i = 0; i < offset.length; i++) {
+              if (typeof offset[i] == 'string') {
+                if (offset[i].includes('%')) {
+                  relativeOffset[i] = parseInt(offset[i].replace('%', '') * _this4.windowWidth / 100);
+                } else {
+                  relativeOffset[i] = parseInt(offset[i]);
+                }
+              } else {
+                relativeOffset[i] = offset[i];
+              }
+            }
+
+            left = left + relativeOffset[0];
+            right = right - relativeOffset[1];
+          } else {
+            for (var i = 0; i < offset.length; i++) {
+              if (typeof offset[i] == 'string') {
+                if (offset[i].includes('%')) {
+                  relativeOffset[i] = parseInt(offset[i].replace('%', '') * _this4.windowHeight / 100);
+                } else {
+                  relativeOffset[i] = parseInt(offset[i]);
+                }
+              } else {
+                relativeOffset[i] = offset[i];
+              }
+            }
+
+            top = top + relativeOffset[0];
+            bottom = bottom - relativeOffset[1];
+          }
+        }
+
         var mappedEl = {
           el: el,
-          targetEl: targetEl,
           id: id,
           "class": cl,
+          section: section,
           top: top,
+          middle: middle,
           bottom: bottom,
           left: left,
           right: right,
@@ -1221,33 +1390,43 @@ var _default$1 = /*#__PURE__*/function (_Core) {
           progress: 0,
           repeat: repeat,
           inView: false,
-          call: call
+          call: call,
+          speed: speed,
+          delay: delay,
+          position: position,
+          target: targetEl,
+          direction: direction,
+          sticky: sticky
         };
-        _this3.els[id] = mappedEl;
+        _this4.els[id] = mappedEl;
 
         if (el.classList.contains(cl)) {
-          _this3.setInView(_this3.els[id], id);
+          _this4.setInView(_this4.els[id], id);
         }
-      });
+
+        if (speed !== false || sticky) {
+          _this4.parallaxElements[id] = mappedEl;
+        }
+      }); // });
     }
   }, {
     key: "updateElements",
     value: function updateElements() {
-      var _this4 = this;
+      var _this5 = this;
 
-      Object.entries(this.els).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            i = _ref2[0],
-            el = _ref2[1];
+      Object.entries(this.els).forEach(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            i = _ref4[0],
+            el = _ref4[1];
 
-        var top = el.targetEl.getBoundingClientRect().top + _this4.instance.scroll.y;
+        var top = el.targetEl.getBoundingClientRect().top + _this5.instance.scroll.y;
 
         var bottom = top + el.targetEl.offsetHeight;
 
-        var relativeOffset = _this4.getRelativeOffset(el.offset);
+        var relativeOffset = _this5.getRelativeOffset(el.offset);
 
-        _this4.els[i].top = top + relativeOffset[0];
-        _this4.els[i].bottom = bottom - relativeOffset[1];
+        _this5.els[i].top = top + relativeOffset[0];
+        _this5.els[i].bottom = bottom - relativeOffset[1];
       });
       this.hasScrollTicking = false;
     }
@@ -1271,6 +1450,116 @@ var _default$1 = /*#__PURE__*/function (_Core) {
       }
 
       return relativeOffset;
+    }
+  }, {
+    key: "transform",
+    value: function transform(element, x, y, delay) {
+      var transform;
+
+      if (!delay) {
+        transform = "matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,".concat(x, ",").concat(y, ",0,1)");
+      } else {
+        var start = getTranslate(element);
+        var lerpX = lerp(start.x, x, delay);
+        var lerpY = lerp(start.y, y, delay);
+        transform = "matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,".concat(lerpX, ",").concat(lerpY, ",0,1)");
+      }
+
+      element.style.webkitTransform = transform;
+      element.style.msTransform = transform;
+      element.style.transform = transform;
+    }
+  }, {
+    key: "transformElements",
+    value: function transformElements(isForced) {
+      var _this6 = this;
+
+      var setAllElements = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var scrollRight = this.instance.scroll.x + this.windowWidth;
+      var scrollBottom = this.instance.scroll.y + this.windowHeight;
+      var scrollMiddle = {
+        x: this.instance.scroll.x + this.windowMiddle.x,
+        y: this.instance.scroll.y + this.windowMiddle.y
+      };
+      Object.entries(this.parallaxElements).forEach(function (_ref5) {
+        var _ref6 = _slicedToArray(_ref5, 2),
+            i = _ref6[0],
+            current = _ref6[1];
+
+        var transformDistance = false;
+
+        if (isForced) {
+          transformDistance = 0;
+        }
+
+        if (current.inView || setAllElements) {
+          switch (current.position) {
+            case 'top':
+              transformDistance = _this6.instance.scroll[_this6.directionAxis] * -current.speed;
+              break;
+
+            case 'elementTop':
+              transformDistance = (scrollBottom - current.top) * -current.speed;
+              break;
+
+            case 'bottom':
+              transformDistance = (_this6.instance.limit[_this6.directionAxis] - scrollBottom + _this6.windowHeight) * current.speed;
+              break;
+
+            case 'left':
+              transformDistance = _this6.instance.scroll[_this6.directionAxis] * -current.speed;
+              break;
+
+            case 'elementLeft':
+              transformDistance = (scrollRight - current.left) * -current.speed;
+              break;
+
+            case 'right':
+              transformDistance = (_this6.instance.limit[_this6.directionAxis] - scrollRight + _this6.windowHeight) * current.speed;
+              break;
+
+            default:
+              transformDistance = (scrollMiddle[_this6.directionAxis] - current.middle[_this6.directionAxis]) * -current.speed;
+              break;
+          }
+        }
+
+        if (current.sticky) {
+          if (current.inView) {
+            if (_this6.direction === 'horizontal') {
+              transformDistance = _this6.instance.scroll.x - current.left + window.innerWidth;
+            } else {
+              transformDistance = _this6.instance.scroll.y - current.top + window.innerHeight;
+            }
+          } else {
+            if (_this6.direction === 'horizontal') {
+              if (_this6.instance.scroll.x < current.left - window.innerWidth && _this6.instance.scroll.x < current.left - window.innerWidth / 2) {
+                transformDistance = 0;
+              } else if (_this6.instance.scroll.x > current.right && _this6.instance.scroll.x > current.right + 100) {
+                transformDistance = current.right - current.left + window.innerWidth;
+              } else {
+                transformDistance = false;
+              }
+            } else {
+              if (_this6.instance.scroll.y < current.top - window.innerHeight && _this6.instance.scroll.y < current.top - window.innerHeight / 2) {
+                transformDistance = 0;
+              } else if (_this6.instance.scroll.y > current.bottom && _this6.instance.scroll.y > current.bottom + 100) {
+                transformDistance = current.bottom - current.top + window.innerHeight;
+              } else {
+                transformDistance = false;
+              }
+            }
+          }
+        }
+
+        if (transformDistance !== false) {
+          if (current.direction === 'horizontal' || _this6.direction === 'horizontal' && current.direction !== 'vertical') {
+            _this6.transform(current.el, transformDistance, 0, isForced ? false : current.delay);
+          } else {
+            _this6.transform(current.el, 0, transformDistance, isForced ? false : current.delay);
+          }
+        }
+      });
     }
     /**
      * Scroll to a desired target.
@@ -1885,46 +2174,6 @@ VirtualScroll.prototype.destroy = function() {
     this._unbind();
 };
 
-function lerp(start, end, amt) {
-  return (1 - amt) * start + amt * end;
-}
-
-function getTranslate(el) {
-  var translate = {};
-  if (!window.getComputedStyle) return;
-  var style = getComputedStyle(el);
-  var transform = style.transform || style.webkitTransform || style.mozTransform;
-  var mat = transform.match(/^matrix3d\((.+)\)$/);
-
-  if (mat) {
-    translate.x = mat ? parseFloat(mat[1].split(', ')[12]) : 0;
-    translate.y = mat ? parseFloat(mat[1].split(', ')[13]) : 0;
-  } else {
-    mat = transform.match(/^matrix\((.+)\)$/);
-    translate.x = mat ? parseFloat(mat[1].split(', ')[4]) : 0;
-    translate.y = mat ? parseFloat(mat[1].split(', ')[5]) : 0;
-  }
-
-  return translate;
-}
-
-/**
- * Returns an array containing all the parent nodes of the given node
- * @param  {object} node
- * @return {array} parent nodes
- */
-function getParents(elem) {
-  // Set up a parent array
-  var parents = []; // Push each parent element to the array
-
-  for (; elem && elem !== document; elem = elem.parentNode) {
-    parents.push(elem);
-  } // Return our parent array
-
-
-  return parents;
-} // https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
-
 /**
  * https://github.com/gre/bezier-easing
  * BezierEasing - use bezier curve for transition easing function
@@ -2145,15 +2394,14 @@ var _default$2 = /*#__PURE__*/function (_Core) {
     value: function startScrolling() {
       this.startScrollTs = Date.now(); // Record timestamp
 
-      this.isScrolling = true;
-      this.checkScroll();
+      this.isScrolling = true; // this.checkScroll();
+
       this.html.classList.add(this.scrollingClass);
     }
   }, {
     key: "stopScrolling",
     value: function stopScrolling() {
-      cancelAnimationFrame(this.checkScrollRaf); // Prevent checkScroll to continue looping
-
+      // cancelAnimationFrame(this.checkScrollRaf); // Prevent checkScroll to continue looping
       if (this.scrollToRaf) {
         cancelAnimationFrame(this.scrollToRaf);
         this.scrollToRaf = null;
@@ -2244,9 +2492,14 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       if (this.instance.delta[this.directionAxis] > this.instance.limit[this.directionAxis]) this.instance.delta[this.directionAxis] = this.instance.limit[this.directionAxis];
       this.stopScrolling(); // Stop any movement, allows to kill any other `scrollTo` still happening
 
-      this.isScrolling = true;
-      this.checkScroll();
+      this.isScrolling = true; // this.checkScroll();
+
       this.html.classList.add(this.scrollingClass);
+    }
+  }, {
+    key: "raf",
+    value: function raf() {
+      this.checkScroll();
     }
   }, {
     key: "checkScroll",
@@ -2256,13 +2509,10 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       var forced = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       if (forced || this.isScrolling || this.isDraggingScrollbar) {
-        if (!this.hasScrollTicking) {
-          this.checkScrollRaf = requestAnimationFrame(function () {
-            return _this4.checkScroll();
-          });
-          this.hasScrollTicking = true;
-        }
-
+        // if (!this.hasScrollTicking) {
+        // this.checkScrollRaf = requestAnimationFrame(() => this.checkScroll());
+        //     this.hasScrollTicking = true;
+        // }
         this.updateScroll();
         var distance = Math.abs(this.instance.delta[this.directionAxis] - this.instance.scroll[this.directionAxis]);
         var timeSinceStart = Date.now() - this.startScrollTs; // Get the time since the scroll was started: the scroll can be stopped again only past 100ms
@@ -2323,9 +2573,8 @@ var _default$2 = /*#__PURE__*/function (_Core) {
           }
         }
 
-        _get(_getPrototypeOf(_default.prototype), "checkScroll", this).call(this);
+        _get(_getPrototypeOf(_default.prototype), "checkScroll", this).call(this); // this.hasScrollTicking = false;
 
-        this.hasScrollTicking = false;
       }
     }
   }, {
@@ -2502,8 +2751,8 @@ var _default$2 = /*#__PURE__*/function (_Core) {
   }, {
     key: "getScrollBar",
     value: function getScrollBar(e) {
-      this.isDraggingScrollbar = true;
-      this.checkScroll();
+      this.isDraggingScrollbar = true; // this.checkScroll();
+
       this.html.classList.remove(this.scrollingClass);
       this.html.classList.add(this.draggingClass);
     }
@@ -3062,6 +3311,8 @@ var Smooth = /*#__PURE__*/function () {
   _createClass(Smooth, [{
     key: "init",
     value: function init() {
+      var _this = this;
+
       this.options.isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 || window.innerWidth < this.tablet.breakpoint;
       this.options.isTablet = this.options.isMobile && window.innerWidth >= this.tablet.breakpoint;
 
@@ -3079,6 +3330,26 @@ var Smooth = /*#__PURE__*/function () {
         var target = document.getElementById(id); // If found, scroll to the element
 
         if (target) this.scroll.scrollTo(target);
+      }
+
+      if (this.autoRaf) {
+        requestAnimationFrame(function () {
+          return _this.raf();
+        });
+      }
+    }
+  }, {
+    key: "raf",
+    value: function raf() {
+      var _this$scroll,
+          _this2 = this;
+
+      (_this$scroll = this.scroll) === null || _this$scroll === void 0 ? void 0 : _this$scroll.raf();
+
+      if (this.autoRaf) {
+        requestAnimationFrame(function () {
+          return _this2.raf();
+        });
       }
     }
   }, {

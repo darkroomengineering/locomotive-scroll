@@ -55,6 +55,17 @@ export class Smooth {
             // If found, scroll to the element
             if (target) this.scroll.scrollTo(target);
         }
+
+        if (this.autoRaf) {
+            requestAnimationFrame(() => this.raf());
+        }
+    }
+
+    raf() {
+        this.scroll?.raf();
+        if (this.autoRaf) {
+            requestAnimationFrame(() => this.raf());
+        }
     }
 
     update() {

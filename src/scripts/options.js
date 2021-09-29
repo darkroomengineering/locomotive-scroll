@@ -23,6 +23,7 @@ export const defaults = {
     firefoxMultiplier: 50,
     touchMultiplier: 2,
     resetNativeScroll: true,
+    autoRaf: true,
     tablet: {
         smooth: false,
         direction: 'vertical',
