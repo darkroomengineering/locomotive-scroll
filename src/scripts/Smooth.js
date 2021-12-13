@@ -1,9 +1,9 @@
+import BezierEasing from 'bezier-easing';
 import virtualScroll from 'virtual-scroll';
 import Core from './Core';
+import { getParents } from './utils/html';
 import { lerp } from './utils/maths';
 import { getTranslate } from './utils/transform';
-import { getParents, queryClosestParent } from './utils/html';
-import BezierEasing from 'bezier-easing';
 
 const keyCodes = {
     LEFT: 37,
