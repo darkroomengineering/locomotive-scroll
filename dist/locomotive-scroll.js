@@ -1,4 +1,4 @@
-/* locomotive-scroll v4.1.2 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* locomotive-scroll v0.0.1 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1400,7 +1400,7 @@
             speed: speed,
             delay: delay,
             position: position,
-            target: targetEl,
+            targetEl: targetEl,
             direction: direction,
             sticky: sticky
           };
@@ -1420,10 +1420,13 @@
       value: function updateElements() {
         var _this5 = this;
 
+        console.log(this.els);
         Object.entries(this.els).forEach(function (_ref3) {
           var _ref4 = _slicedToArray(_ref3, 2),
               i = _ref4[0],
               el = _ref4[1];
+
+          console.log(el);
 
           var top = el.targetEl.getBoundingClientRect().top + _this5.instance.scroll.y;
 

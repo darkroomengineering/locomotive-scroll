@@ -283,7 +283,7 @@ export default class extends Core {
                 speed,
                 delay,
                 position,
-                target: targetEl,
+                targetEl: targetEl,
                 direction,
                 sticky
             };
