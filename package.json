@@ -1,6 +1,6 @@
 {
   "name": "@studio-freight/locomotive-scroll",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Detection of elements in viewport & smooth scrolling with parallax effects.",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
   "dependencies": {
     "bezier-easing": "^2.1.0",
     "smoothscroll-polyfill": "^0.4.4",
-    "virtual-scroll": "^1.5.2"
+    "virtual-scroll": "^2.1.1"
   },
   "bugs": {
     "url": "https://github.com/studio-freight/locomotive-scroll/issues"
