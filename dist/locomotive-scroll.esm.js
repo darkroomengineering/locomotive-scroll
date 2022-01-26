@@ -1,4 +1,4 @@
-/* locomotive-scroll v0.0.3 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* locomotive-scroll v0.0.5 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -251,47 +251,49 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var defaults = {
-  el: document,
-  name: 'scroll',
-  offset: [0, 0],
-  repeat: false,
-  smooth: false,
-  initPosition: {
-    x: 0,
-    y: 0
-  },
-  direction: 'vertical',
-  gestureDirection: 'vertical',
-  reloadOnContextChange: false,
-  lerp: 0.1,
-  "class": 'is-inview',
-  scrollbarContainer: false,
-  scrollbarClass: 'c-scrollbar',
-  scrollingClass: 'has-scroll-scrolling',
-  draggingClass: 'has-scroll-dragging',
-  smoothClass: 'has-scroll-smooth',
-  initClass: 'has-scroll-init',
-  getSpeed: false,
-  getDirection: false,
-  scrollFromAnywhere: false,
-  multiplier: 1,
-  firefoxMultiplier: 50,
-  touchMultiplier: 2,
-  resetNativeScroll: true,
-  autoRaf: true,
-  tablet: {
+function getDefaults() {
+  return {
+    el: document,
+    name: 'scroll',
+    offset: [0, 0],
+    repeat: false,
     smooth: false,
+    initPosition: {
+      x: 0,
+      y: 0
+    },
     direction: 'vertical',
     gestureDirection: 'vertical',
-    breakpoint: 1024
-  },
-  smartphone: {
-    smooth: false,
-    direction: 'vertical',
-    gestureDirection: 'vertical'
-  }
-};
+    reloadOnContextChange: false,
+    lerp: 0.1,
+    "class": 'is-inview',
+    scrollbarContainer: false,
+    scrollbarClass: 'c-scrollbar',
+    scrollingClass: 'has-scroll-scrolling',
+    draggingClass: 'has-scroll-dragging',
+    smoothClass: 'has-scroll-smooth',
+    initClass: 'has-scroll-init',
+    getSpeed: false,
+    getDirection: false,
+    scrollFromAnywhere: false,
+    multiplier: 1,
+    firefoxMultiplier: 50,
+    touchMultiplier: 2,
+    resetNativeScroll: true,
+    autoRaf: true,
+    tablet: {
+      smooth: false,
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      breakpoint: 1024
+    },
+    smartphone: {
+      smooth: false,
+      direction: 'vertical',
+      gestureDirection: 'vertical'
+    }
+  };
+}
 
 var _default = /*#__PURE__*/function () {
   function _default() {
@@ -299,6 +301,7 @@ var _default = /*#__PURE__*/function () {
 
     _classCallCheck(this, _default);
 
+    var defaults = getDefaults();
     Object.assign(this, defaults, options);
     this.smartphone = defaults.smartphone;
     if (options.smartphone) Object.assign(this.smartphone, options.smartphone);
@@ -2775,7 +2778,8 @@ var Smooth = /*#__PURE__*/function () {
 
     _classCallCheck(this, Smooth);
 
-    this.options = options; // Override default options with given ones
+    this.options = options;
+    var defaults = getDefaults(); // Override default options with given ones
 
     Object.assign(this, defaults, options);
     this.smartphone = defaults.smartphone;
@@ -2883,7 +2887,8 @@ var Native = /*#__PURE__*/function () {
 
     _classCallCheck(this, Native);
 
-    this.options = options; // Override default options with given ones
+    this.options = options;
+    var defaults = getDefaults(); // Override default options with given ones
 
     Object.assign(this, defaults, options);
     this.smartphone = defaults.smartphone;

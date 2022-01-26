@@ -1,10 +1,11 @@
-import { defaults } from './options';
+import { getDefaults } from './options';
 import NativeScroll from './Native';
 import SmoothScroll from './Smooth';
 
 export class Smooth {
     constructor(options = {}) {
         this.options = options;
+        const defaults = getDefaults();
 
         // Override default options with given ones
         Object.assign(this, defaults, options);

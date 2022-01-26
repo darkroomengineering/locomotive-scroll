@@ -1,9 +1,10 @@
-import { defaults } from './options';
+import { getDefaults } from './options';
 import Scroll from './Native';
 
 export class Native {
     constructor(options = {}) {
         this.options = options;
+        const defaults = getDefaults();
 
         // Override default options with given ones
         Object.assign(this, defaults, options);

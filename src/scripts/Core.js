@@ -1,7 +1,8 @@
-import { defaults } from './options';
+import { getDefaults } from './options';
 
 export default class {
     constructor(options = {}) {
+        const defaults = getDefaults();
         Object.assign(this, defaults, options);
         this.smartphone = defaults.smartphone;
         if (options.smartphone) Object.assign(this.smartphone, options.smartphone);
