@@ -14,7 +14,7 @@
 <p>This package includes:
 <ul>
     <li>custom raf option</li>
-    <li>parallax on mobile</li>
+    <li>parallax on native scroll</li>
 </ul>
 </p>
 
