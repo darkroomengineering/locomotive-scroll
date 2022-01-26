@@ -13,7 +13,7 @@
 [Locomotive Scroll](https://github.com/locomotivemtl/locomotive-scroll) seems to be not maintained anymore.
 <p>This package includes:
 <ul>
-    <li>SSR proof/li>
+    <li>SSR proof</li>
     <li>custom raf option</li>
     <li>parallax on native scroll</li>
 </ul>
