@@ -10,9 +10,10 @@
 <p align="center">Detection of elements in viewport & smooth scrolling with parallax effects.</p>
 
 ## Why
-[Locomotive Scroll](https://github.com/locomotivemtl/locomotive-scroll) seems to be not maintained anymore.
+[Locomotive Scroll](https://github.com/locomotivemtl/locomotive-scroll) seems to not be maintained anymore.
 <p>This package includes:
 <ul>
+    <li>SSR proof</li>
     <li>custom raf option</li>
     <li>parallax on native scroll</li>
 </ul>
