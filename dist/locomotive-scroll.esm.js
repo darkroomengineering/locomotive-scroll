@@ -1,4 +1,4 @@
-/* locomotive-scroll v0.0.5 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* locomotive-scroll v0.0.6 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -329,8 +329,8 @@ var _default = /*#__PURE__*/function () {
         y: 0
       },
       limit: {
-        x: this.html.offsetWidth,
-        y: this.html.offsetHeight
+        x: this.html.offsetWidth - this.windowWidth,
+        y: this.html.offsetHeight - this.windowHeight
       },
       currentElements: this.currentElements
     };

@@ -1,4 +1,4 @@
-/* locomotive-scroll v0.0.5 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* locomotive-scroll v0.0.6 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -335,8 +335,8 @@
           y: 0
         },
         limit: {
-          x: this.html.offsetWidth,
-          y: this.html.offsetHeight
+          x: this.html.offsetWidth - this.windowWidth,
+          y: this.html.offsetHeight - this.windowHeight
         },
         currentElements: this.currentElements
       };

@@ -34,8 +34,8 @@ export default class {
                 y: 0
             },
             limit: {
-                x: this.html.offsetWidth,
-                y: this.html.offsetHeight
+                x: this.html.offsetWidth - this.windowWidth,
+                y: this.html.offsetHeight - this.windowHeight
             },
             currentElements: this.currentElements
         };
