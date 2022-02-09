@@ -17,20 +17,28 @@ function styles() {
         {
             src: paths.styles.docs.src,
             dest: paths.styles.docs.dest
-       }
+        }
     ];
 
-    const streams = files.map((file) => {
+    const streams = files.map((file) => {
         return gulp
             .src(file.src + '**/*.scss')
             .pipe(sass())
-            .on('error', function(err) {
+            .on('error', function (err) {
                 error(this, err, 'stack');
             })
-            .pipe(autoprefixer({
-                cascade: false
-            }))
-            .pipe(header('/*! locomotive-scroll v' + pkg.version + ' | MIT License | https://github.com/locomotivemtl/locomotive-scroll */\n'))
+            .pipe(
+                autoprefixer({
+                    cascade: false
+                })
+            )
+            .pipe(
+                header(
+                    '/*! studio-freight/locomotive-scroll v' +
+                        pkg.version +
+                        ' | MIT License | https://github.com/studio-freight/locomotive-scroll */\n'
+                )
+            )
             .pipe(gulp.dest(file.dest))
             .pipe(server.stream());
     });

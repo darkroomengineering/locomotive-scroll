@@ -25,26 +25,29 @@ function scripts() {
         }
     ];
 
-    const promises = files.map((file) => {
+    const promises = files.map((file) => {
         return rollup({
-                input: file.src + '.js',
-                plugins: [
-                    resolve(),
-                    babel({
-                        exclude: 'node_modules/**'
-                    }),
-                    common({
-                        include: 'node_modules/**'
-                    }),
-                ]
-            }).then(bundle => {
-                return bundle.write({
-                    file: file.dest + '.js',
-                    name: 'LocomotiveScroll',
-                    format: file.format,
-                    banner: '/* locomotive-scroll v' + pkg.version + ' | MIT License | https://github.com/locomotivemtl/locomotive-scroll */'
-                });
-            })
+            input: file.src + '.js',
+            plugins: [
+                resolve(),
+                babel({
+                    exclude: 'node_modules/**'
+                }),
+                common({
+                    include: 'node_modules/**'
+                })
+            ]
+        }).then((bundle) => {
+            return bundle.write({
+                file: file.dest + '.js',
+                name: 'LocomotiveScroll',
+                format: file.format,
+                banner:
+                    '/* studio-freight/locomotive-scroll v' +
+                    pkg.version +
+                    ' | https://github.com/studio-freight/locomotive-scroll */'
+            });
+        });
     });
 
     return Promise.all(promises);

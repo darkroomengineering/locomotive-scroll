@@ -1,10 +1,27 @@
 html {
-    &.has-scroll-smooth {
+    &.has-scroll-smooth,
+    &:not(.has-scroll-init) {
         overflow: hidden;
     }
 
     &.has-scroll-dragging {
         user-select: none;
+    }
+
+    // https://github.com/locomotivemtl/locomotive-scroll/issues/353
+    &.has-scroll-smooth {
+        overflow: hidden;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    &:not(.has-scroll-smooth) {
+        [data-scroll-section] {
+            transform: unset !important;
+        }
     }
 }
 
@@ -18,7 +35,7 @@ body {
     .has-scroll-smooth & {
         min-height: 100vh;
     }
-    [data-scroll-direction="horizontal"] & {
+    [data-scroll-direction='horizontal'] & {
         height: 100vh;
         display: inline-block;
         white-space: nowrap;
@@ -26,12 +43,10 @@ body {
 }
 
 [data-scroll-section] {
-    [data-scroll-direction="horizontal"] & {
+    [data-scroll-direction='horizontal'] & {
         display: inline-block;
         vertical-align: top;
         white-space: nowrap;
         height: 100%;
     }
- }
-
-
+}

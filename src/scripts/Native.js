@@ -86,8 +86,12 @@ export default class extends Core {
     }
 
     resize() {
+        this.windowHeight = window.innerHeight;
+        this.windowWidth = window.innerWidth;
+        this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
+        this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
+
         if (Object.entries(this.els).length) {
-            this.windowHeight = window.innerHeight;
             this.updateElements();
         }
     }

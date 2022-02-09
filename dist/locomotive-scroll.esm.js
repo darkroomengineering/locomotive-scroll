@@ -1,4 +1,4 @@
-/* locomotive-scroll v0.0.6 | MIT License | https://github.com/locomotivemtl/locomotive-scroll */
+/* studio-freight/locomotive-scroll v0.0.7 | https://github.com/studio-freight/locomotive-scroll */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1212,8 +1212,12 @@ var _default$1 = /*#__PURE__*/function (_Core) {
   }, {
     key: "resize",
     value: function resize() {
+      this.windowHeight = window.innerHeight;
+      this.windowWidth = window.innerWidth;
+      this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
+      this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
+
       if (Object.entries(this.els).length) {
-        this.windowHeight = window.innerHeight;
         this.updateElements();
       }
     }
