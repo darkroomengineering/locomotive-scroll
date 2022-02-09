@@ -1,4 +1,4 @@
-/* studio-freight/locomotive-scroll v0.0.7 | https://github.com/studio-freight/locomotive-scroll */
+/* studio-freight/locomotive-scroll v0.0.8 | https://github.com/studio-freight/locomotive-scroll */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1220,12 +1220,7 @@
       value: function resize() {
         this.windowHeight = window.innerHeight;
         this.windowWidth = window.innerWidth;
-        this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
-        this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
-
-        if (Object.entries(this.els).length) {
-          this.updateElements();
-        }
+        this.update();
       }
     }, {
       key: "addSections",
@@ -1648,7 +1643,14 @@
     }, {
       key: "update",
       value: function update() {
+        this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
+        this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
         this.addElements();
+
+        if (Object.entries(this.els).length) {
+          this.updateElements();
+        }
+
         this.detectElements();
       }
     }, {

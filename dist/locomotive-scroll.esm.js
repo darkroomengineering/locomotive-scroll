@@ -1,4 +1,4 @@
-/* studio-freight/locomotive-scroll v0.0.7 | https://github.com/studio-freight/locomotive-scroll */
+/* studio-freight/locomotive-scroll v0.0.8 | https://github.com/studio-freight/locomotive-scroll */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1214,12 +1214,7 @@ var _default$1 = /*#__PURE__*/function (_Core) {
     value: function resize() {
       this.windowHeight = window.innerHeight;
       this.windowWidth = window.innerWidth;
-      this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
-      this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
-
-      if (Object.entries(this.els).length) {
-        this.updateElements();
-      }
+      this.update();
     }
   }, {
     key: "addSections",
@@ -1642,7 +1637,14 @@ var _default$1 = /*#__PURE__*/function (_Core) {
   }, {
     key: "update",
     value: function update() {
+      this.instance.limit.x = this.html.offsetWidth - this.windowWidth;
+      this.instance.limit.y = this.html.offsetHeight - this.windowHeight;
       this.addElements();
+
+      if (Object.entries(this.els).length) {
+        this.updateElements();
+      }
+
       this.detectElements();
     }
   }, {

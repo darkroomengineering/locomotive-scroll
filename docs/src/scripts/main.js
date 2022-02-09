@@ -33,6 +33,7 @@ import LocomotiveScroll from '../../../src/locomotive-scroll';
 
     setTimeout(() => {
         const scroll = new LocomotiveScroll(options);
+        window.scroll = scroll;
 
         function onFrame() {
             scroll.raf();
