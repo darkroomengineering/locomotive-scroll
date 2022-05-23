@@ -1,6 +1,8 @@
 [![](https://img.shields.io/npm/v/@studio-freight/locomotive-scroll)](https://www.npmjs.com/package/@studio-freight/locomotive-scroll)
 [![](https://img.shields.io/npm/dm/@studio-freight/locomotive-scroll)](https://www.npmjs.com/package/@studio-freight/locomotive-scroll)
 
+/!\ This library will not be maintained  anymore, we advice you to use [Lenis](https://github.com/studio-freight/lenis) instead
+
 <p align="center">
     <a href="https://github.com/studio-freight/locomotive-scroll">
         <img src="https://user-images.githubusercontent.com/4596862/58807621-67aeec00-85e6-11e9-8e3a-3fe4123ee76c.png" height="140">
